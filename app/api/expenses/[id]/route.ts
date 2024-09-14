@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const updatedExpense = await prisma.fixedExpense.update({
-      where: { id: id },
+      where: { id },
       data: {
         name,
         amount: parseFloat(amount),
@@ -36,7 +36,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const { id } = params;
   try {
     await prisma.fixedExpense.delete({
-      where: { id: id },
+      where: { id },
     });
 
     return new Response(JSON.stringify({ message: 'Expense deleted successfully' }), {
