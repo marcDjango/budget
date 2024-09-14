@@ -25,6 +25,7 @@ const AddCharge = () => {
   // Mettre à jour userId lorsque la session est disponible
   useEffect(() => {
     if (session && session.user) {
+      console.log(session)
       setFormData((prevData) => ({
         ...prevData,
         userId: session?.user?.id,

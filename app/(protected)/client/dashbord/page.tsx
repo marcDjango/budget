@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<{ name?: string; amount?: number; category?: string }>({});
   const totalFixedExpenses = fixedExpenses.reduce((total, expense) => total + expense.amount, 0);
+  
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
