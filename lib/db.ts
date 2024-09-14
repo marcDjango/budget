@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 
 declare global {
-    var prisma: PrismaClient | undefined;
+  // Permet d'utiliser 'prisma' globalement sans provoquer d'erreur TypeScript
+  var prisma: PrismaClient | undefined;
 }
 
 export const db = globalThis.prisma || new PrismaClient();
 
-if(process.env.Node_ENV !== "production") globalThis.prisma = db;
+// Vérification correcte de la variable d'environnement
+if (process.env.NODE_ENV !== "production") globalThis.prisma = db;
