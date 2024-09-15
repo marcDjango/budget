@@ -24,11 +24,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmoun
       {/* Partie droite - Répartition */}
       <div className="w-full md:w-1/2 mt-4 md:mt-0">
         <h3 className="text-lg font-semibold text-gray-800">Répartition</h3>
-        <p className="text-sm text-gray-600">
-          Eugénie: {user1Amount.toFixed(2)} € ({user1Percentage}%) - 
-          Marcelo: {user2Amount.toFixed(2)} € ({user2Percentage}%)
-        </p>
-
+        
         {/* Barre de curseur */}
         <input
           type="range"
@@ -38,18 +34,33 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmoun
           onChange={(e) => setUser1Percentage(Number(e.target.value))}
           className="w-full mt-2"
         />
+        
+        <p className="text-sm text-gray-600 flex flex-row justify-between ">
+          <p>Eugénie: {user1Amount.toFixed(2)} €</p>
+          <p>Marcelo: {user2Amount.toFixed(2)} €</p>
+        </p>
+
 
         {/* Affichage graphique (barre de répartition) */}
         <div className="flex items-center mt-2">
-          <div
-            className="h-4 bg-blue-500"
-            style={{ width: `${user1Percentage}%`, minWidth: '20px' }} // minWidth pour éviter la barre trop fine
-          />
-          <div
-            className="h-4 bg-green-500"
-            style={{ width: `${user2Percentage}%`, minWidth: '20px' }} // minWidth pour éviter la barre trop fine
-          />
-        </div>
+  {user1Percentage > 0 && (
+    <div
+      className="h-4 bg-blue-500 flex items-center justify-center text-white text-sm"
+      style={{ width: `${user1Percentage}%`, minWidth: '0px' }} // minWidth pour éviter la barre trop fine
+    >
+      {user1Percentage}%
+    </div>
+  )}
+  {user2Percentage > 0 && (
+    <div
+      className="h-4 bg-green-500 flex items-center justify-center text-white text-sm"
+      style={{ width: `${user2Percentage}%`, minWidth: '0px' }} // minWidth pour éviter la barre trop fine
+    >
+      {user2Percentage}%
+    </div>
+  )}
+</div>
+
       </div>
     </div>
   );

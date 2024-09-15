@@ -105,16 +105,16 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-1 p-4 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
+      <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
         {/* Header Section */}
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-4 md:p-2">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+        <div className="max-w-4xl mx-auto bg-white md:rounded-lg shadow-lg p-4 md:p-2">
+          <div className="flex flex-row md:flex-col items-center justify-between mb-4">
             <h1 className={cn("text-3xl md:text-4xl font-bold text-gray-800", font.className)}>
               Tableau de bord
             </h1>
-            <Button variant="secondary" size="lg" className="flex items-center mt-4 md:mt-0">
+            <Button variant="secondary" size="sm" className="flex items-center py-4 md:mt-0">
               <BarChartIcon className="w-6 h-6 mr-2" />
-              Statistiques
+              <span className="hidden md:inline">Statistiques</span>
             </Button>
           </div>
   
@@ -135,9 +135,9 @@ export default function Dashboard() {
           {/* List of Fixed Expenses */}
           <div>
     <h2 className="text-xl font-semibold text-gray-800 mb-4">Détails des Charges Fixes</h2>
-    <ul className="space-y-2">
+    <ul className="space-y-2 border border-gray-300 rounded-lg p-4 pb-0">
       {fixedExpenses.map((expense) => (
-        <li key={expense.id} className="flex items-center bg-gray-100 rounded-lg p-4 shadow-sm">
+        <li key={expense.id} className="flex items-center border-b border-b-gray-300 p-2 shadow-sm">
           <div className="flex items-center space-x-4 flex-1">
             <div className="flex-shrink-0">
               {categoryIcons[expense.category] || <HomeIcon className="w-6 h-6 text-gray-500" />}
@@ -221,7 +221,7 @@ export default function Dashboard() {
   </div>
   
           {/* New Expense Button */}
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 mb-8 flex justify-center">
             <NewButton>
               <Button variant="secondary" size="lg">
                 <PlusIcon className="w-5 h-5 mr-2" />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/router";
 import { CardWrapper } from "./card-wrapper"
 import * as z from "zod";
 import {useForm} from "react-hook-form";
@@ -19,13 +20,14 @@ import { FormError } from "./form-error";
 import { FormSucces } from "./form-succes";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
-
+import { redirectAfterDelay } from '@/lib/utils';
 
 export const LoginForm =() =>{
 const [error, setError]= useState<string | undefined>("");
 const [success, setSuccess] = useState<string | undefined>("");
 
 const [isPending, startTransition] = useTransition();
+// const router = useRouter();
 
 const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -37,15 +39,16 @@ const form = useForm<z.infer<typeof LoginSchema>>({
 const onSubmit =( values: z.infer<typeof LoginSchema>)=>{
     setError("");
     setSuccess("");
-   startTransition(()=>{
-       login(values)
-        .then((data)=>{
-            if(data){
-                setError(data.error);
-                setSuccess(data.success);
-            }
-        })
-   })
+    startTransition(()=>{
+        login(values)
+            .then((data)=>{
+                if(data){
+                    setError(data.error);
+                    setSuccess(data.success);
+                    // redirectAfterDelay(router,"/client/dashbord",2000)
+                }
+            })
+    })
 }
 
     return (
