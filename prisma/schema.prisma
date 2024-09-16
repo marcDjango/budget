@@ -77,16 +77,21 @@ model VerificationToken {
 }
 
 model FixedExpense {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  name      String // nom de la charge fixe (ex: loyer, électricité)
-  amount    Float // montant de la charge fixe
-  category  String // catégorie de la charge fixe (ex: logement, services)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  name         String
+  amount       Float
+  category     String
+  paid         Boolean  @default(false) // Nouveau champ
+  paymentDate  DateTime? // Nouveau champ (peut être null)
+  occurrence   String?  // Nouveau champ (peut être null)
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("fixed_expenses")
 }
+
+
 
 model MonthlyExpense {
   id        String   @id @default(cuid())

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 
 interface FixedExpensesCardProps {
@@ -15,10 +16,17 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmoun
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 flex flex-col md:flex-row items-center justify-between">
       {/* Partie gauche - Total des charges */}
-      <div className="w-full md:w-1/2">
+      <div className="w-full  flex flex-row md:w-1/2 gap-4">
+        <div>
         <h2 className="text-xl font-semibold text-gray-800">Charges Fixes</h2>
         <p className="text-lg font-medium text-gray-600 mt-2">{totalAmount} €</p>
         <p className="text-sm text-gray-500">Total des charges fixes</p>
+        </div>
+        <div>
+        <h2 className="text-xl font-semibold text-gray-800">Reste à payer</h2>
+        <p className="text-lg font-medium text-gray-600 mt-2">{totalAmount} €</p>
+        <p className="text-sm text-gray-500">Total des reste à payer</p>
+        </div>
       </div>
 
       {/* Partie droite - Répartition */}
@@ -35,10 +43,10 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmoun
           className="w-full mt-2"
         />
         
-        <p className="text-sm text-gray-600 flex flex-row justify-between ">
+        <span className="text-sm text-gray-600 flex flex-row justify-between ">
           <p>Eugénie: {user1Amount.toFixed(2)} €</p>
           <p>Marcelo: {user2Amount.toFixed(2)} €</p>
-        </p>
+        </span>
 
 
         {/* Affichage graphique (barre de répartition) */}

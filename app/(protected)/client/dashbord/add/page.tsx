@@ -16,6 +16,9 @@ const AddCharge = () => {
     amount: "",
     category: "",
     userId: session?.user?.id,
+    paid: false,
+    paymentDate: "",
+    occurrence: "monthly", // Valeur par défaut
   });
 
   const [error, setError] = useState<string | undefined>("");  // Ajout de l'état pour l'erreur
@@ -25,10 +28,9 @@ const AddCharge = () => {
   // Mettre à jour userId lorsque la session est disponible
   useEffect(() => {
     if (session && session.user) {
-      console.log(session)
       setFormData((prevData) => ({
         ...prevData,
-        userId: session?.user?.id,
+        userId: session.user.id,
       }));
     }
   }, [session]);
@@ -43,6 +45,9 @@ const AddCharge = () => {
       return;
     }
 
+    // Formatage de la date de paiement
+    const paymentDate = new Date(formData.paymentDate).toISOString();
+
     startTransition(async () => {
       try {
         const response = await fetch("/api/expenses", {
@@ -50,7 +55,10 @@ const AddCharge = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            paymentDate,
+          }),
         });
 
         if (response.ok) {
@@ -62,6 +70,7 @@ const AddCharge = () => {
           
         } else {
           const errorData = await response.json();
+          console.log(response)
           setError(errorData.message || "Une erreur s'est produite.");
         }
       } catch (error) {
@@ -71,7 +80,7 @@ const AddCharge = () => {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -152,6 +161,59 @@ const AddCharge = () => {
               disabled={isPending}
               className="mt-1 block w-full"
             />
+          </div>
+
+          <div>
+            <label htmlFor="paid" className="block text-sm font-medium text-gray-700">
+              Payé
+            </label>
+            <Input
+              type="checkbox"
+              id="paid"
+              name="paid"
+              checked={formData.paid}
+              onChange={(e) => setFormData({
+                ...formData,
+                paid: e.target.checked,
+              })}
+              disabled={isPending}
+              className="mt-1 block w-full"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700">
+              Date de prélèvement
+            </label>
+            <Input
+              type="date"
+              id="paymentDate"
+              name="paymentDate"
+              value={formData.paymentDate}
+              onChange={handleChange}
+              required
+              disabled={isPending}
+              className="mt-1 block w-full"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="occurrence" className="block text-sm font-medium text-gray-700">
+              Occurrence
+            </label>
+            <select
+              id="occurrence"
+              name="occurrence"
+              value={formData.occurrence}
+              onChange={handleChange}
+              disabled={isPending}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              <option value="monthly">Chaque mois</option>
+              <option value="every_2_months">Tous les 2 mois</option>
+              <option value="quarterly">Trimestriel</option>
+              <option value="annually">Annuel</option>
+            </select>
           </div>
 
           <Button
