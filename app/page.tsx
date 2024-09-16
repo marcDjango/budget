@@ -23,7 +23,7 @@ export default function Home() {
         <div>
           {/* Si l'utilisateur est authentifié, afficher le bouton vers le tableau de bord */}        
             <LoginButton>
-              <Button variant="secondary" size="lg">
+              <Button variant="default" size="lg">
                 Se Connecter
               </Button>
             </LoginButton>

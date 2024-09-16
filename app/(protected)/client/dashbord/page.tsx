@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
   TrashIcon,
@@ -61,7 +62,7 @@ export default function Dashboard() {
 
   const calculateTotalPaidAmount = (expenses: Expense[]): number => {
     return expenses
-      .filter(expense => expense.paid) // Filtrer les dépenses dont le statut est 'paid' (true)
+      .filter((expense) => expense.paid) // Filtrer les dépenses dont le statut est 'paid' (true)
       .reduce((total, expense) => total + expense.amount, 0); // Additionner les montants
   };
   const totalPaidAmount = calculateTotalPaidAmount(fixedExpenses);
@@ -70,7 +71,7 @@ export default function Dashboard() {
     (total, expense) => total + expense.amount,
     0
   );
-const restantàpayer= totalFixedExpenses - totalPaidAmount;
+  const restantàpayer = totalFixedExpenses - totalPaidAmount;
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -140,10 +141,8 @@ const restantàpayer= totalFixedExpenses - totalPaidAmount;
   };
 
   const handlePointerClick = async () => {
-      setPointerActive(!isPointerActive); // Active le mode de pointage
+    setPointerActive(!isPointerActive); // Active le mode de pointage
   };
-  
-  
 
   const updatePaymentStatus = async (id: string, isPaid: boolean) => {
     try {
@@ -160,20 +159,20 @@ const restantàpayer= totalFixedExpenses - totalPaidAmount;
   };
 
   const handleCheckboxChange = async (id: string, isChecked: boolean) => {
-  // Mettre à jour l'état local
-  setFixedExpenses((prevExpenses) =>
-    prevExpenses.map((expense) =>
-      expense.id === id ? { ...expense, paid: isChecked } : expense
-    )
-  );
+    // Mettre à jour l'état local
+    setFixedExpenses((prevExpenses) =>
+      prevExpenses.map((expense) =>
+        expense.id === id ? { ...expense, paid: isChecked } : expense
+      )
+    );
 
-  // Mettre à jour le statut de paiement dans le backend
-  try {
-    await updatePaymentStatus(id, isChecked);
-  } catch (error) {
-    console.error('Error updating payment status:', error);
-  }
-};
+    // Mettre à jour le statut de paiement dans le backend
+    try {
+      await updatePaymentStatus(id, isChecked);
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -201,7 +200,10 @@ const restantàpayer= totalFixedExpenses - totalPaidAmount;
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {/* Card for Fixed Expenses */}
-            <FixedExpensesCard totalAmount={totalFixedExpenses} restant={restantàpayer} />
+            <FixedExpensesCard
+              totalAmount={totalFixedExpenses}
+              restant={restantàpayer}
+            />
 
             {/* Card for Monthly Expenses */}
             <div className="bg-white rounded-lg shadow-lg p-2 md:p-4">
@@ -228,7 +230,7 @@ const restantàpayer= totalFixedExpenses - totalPaidAmount;
                 Détails des Charges Fixes
               </h2>
               {/* Bouton "Pointer" */}
-              <Button variant="outline" size="sm" onClick={handlePointerClick}>
+              <Button variant="primaryBorder" size="sm" onClick={handlePointerClick}>
                 {isPointerActive ? "Valider" : "Pointer"}
               </Button>
             </div>
@@ -242,12 +244,12 @@ const restantàpayer= totalFixedExpenses - totalPaidAmount;
                     {/* Affichage des cases à cocher si "Pointer" est actif */}
                     {isPointerActive ? (
                       <>
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={expense.paid}
-                          onChange={(e) =>
-                            handleCheckboxChange(expense.id, e.target.checked)
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange(expense.id, Boolean(checked))
                           }
+                          className="text-blue-500 border-blue-500 focus:ring-blue-500"
                         />
                       </>
                     ) : (
