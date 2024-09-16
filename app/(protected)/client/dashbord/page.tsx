@@ -19,12 +19,19 @@ const font = Poppins({
   subsets: ["latin"],
   weight: ["600"],
 });
+interface Expense {
+  id: string;
+  name: string;
+  amount: number;
+  paid: boolean;
+}
 
 interface FixedExpense {
   id: string;
   name: string;
   amount: number;
   category: string;
+  paid: boolean;
 }
 
 interface MonthlyExpense {
@@ -50,12 +57,20 @@ export default function Dashboard() {
   }>({});
   // Fonctionnalité du bouton "Pointer"
   const [isPointerActive, setPointerActive] = useState(false);
-  const [selectedAmounts, setSelectedAmounts] = useState<number[]>([]);
+  const [selectedAmounts, setSelectedAmounts] = useState<string[]>([]);
+
+  const calculateTotalPaidAmount = (expenses: Expense[]): number => {
+    return expenses
+      .filter(expense => expense.paid) // Filtrer les dépenses dont le statut est 'paid' (true)
+      .reduce((total, expense) => total + expense.amount, 0); // Additionner les montants
+  };
+  const totalPaidAmount = calculateTotalPaidAmount(fixedExpenses);
+
   const totalFixedExpenses = fixedExpenses.reduce(
     (total, expense) => total + expense.amount,
     0
   );
-
+const restantàpayer= totalFixedExpenses - totalPaidAmount;
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -123,20 +138,43 @@ export default function Dashboard() {
       console.error("Erreur:", error);
     }
   };
-  const handlePointerClick = () => {
-    setPointerActive(!isPointerActive);
-    console.log(selectedAmounts)
-  };
 
-  const handleCheckboxChange = (amount: number, isChecked: boolean) => {
-    if (isChecked) {
-      setSelectedAmounts((prev) => [...prev, amount]);
-    } else {
-      setSelectedAmounts((prev) =>
-        prev.filter((selectedAmount) => selectedAmount !== amount)
-      );
+  const handlePointerClick = async () => {
+      setPointerActive(!isPointerActive); // Active le mode de pointage
+  };
+  
+  
+
+  const updatePaymentStatus = async (id: string, isPaid: boolean) => {
+    try {
+      await fetch("/api/expenses/update-payment-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, paid: isPaid }),
+      });
+    } catch (error) {
+      console.error("Error updating payment status:", error);
     }
   };
+
+  const handleCheckboxChange = async (id: string, isChecked: boolean) => {
+  // Mettre à jour l'état local
+  setFixedExpenses((prevExpenses) =>
+    prevExpenses.map((expense) =>
+      expense.id === id ? { ...expense, paid: isChecked } : expense
+    )
+  );
+
+  // Mettre à jour le statut de paiement dans le backend
+  try {
+    await updatePaymentStatus(id, isChecked);
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+  }
+};
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
@@ -163,7 +201,7 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {/* Card for Fixed Expenses */}
-            <FixedExpensesCard totalAmount={totalFixedExpenses} />
+            <FixedExpensesCard totalAmount={totalFixedExpenses} restant={restantàpayer} />
 
             {/* Card for Monthly Expenses */}
             <div className="bg-white rounded-lg shadow-lg p-2 md:p-4">
@@ -206,11 +244,9 @@ export default function Dashboard() {
                       <>
                         <input
                           type="checkbox"
+                          checked={expense.paid}
                           onChange={(e) =>
-                            handleCheckboxChange(
-                              expense.amount,
-                              e.target.checked
-                            )
+                            handleCheckboxChange(expense.id, e.target.checked)
                           }
                         />
                       </>

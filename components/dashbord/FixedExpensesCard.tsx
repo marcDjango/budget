@@ -3,9 +3,10 @@ import React, { useState } from "react";
 
 interface FixedExpensesCardProps {
   totalAmount: number;
+  restant:number;
 }
 
-export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmount }) => {
+export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmount, restant }) => {
   const [user1Percentage, setUser1Percentage] = useState(55); // Pourcentage utilisateur 1
   const user2Percentage = 100 - user1Percentage; // Calcul du pourcentage de l'utilisateur 2
 
@@ -24,7 +25,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({ totalAmoun
         </div>
         <div>
         <h2 className="text-xl font-semibold text-gray-800">Reste à payer</h2>
-        <p className="text-lg font-medium text-gray-600 mt-2">{totalAmount} €</p>
+        <p className="text-lg font-medium text-gray-600 mt-2">{restant} €</p>
         <p className="text-sm text-gray-500">Total des reste à payer</p>
         </div>
       </div>
