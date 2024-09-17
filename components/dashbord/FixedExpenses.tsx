@@ -132,7 +132,7 @@ const FixedExpenses: React.FC<FixedExpensesDetailsProps> = ({
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex justify-between px-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-8">
           Détails des Charges Fixes
         </h2>
