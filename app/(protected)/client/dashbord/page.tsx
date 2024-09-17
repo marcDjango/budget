@@ -15,6 +15,7 @@ import { Poppins } from "next/font/google";
 import { NewButton } from "@/components/dashbord/new-depencies-button";
 import { BarChartIcon } from "@radix-ui/react-icons";
 import { FixedExpensesCard } from "@/components/dashbord/FixedExpensesCard";
+import TabCategory from "@/components/dashbord/tabCategory";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -50,15 +51,6 @@ const categoryIcons: Record<string, React.ReactNode> = {
 export default function Dashboard() {
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const [monthlyExpenses, setMonthlyExpenses] = useState<MonthlyExpense[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState<{
-    name?: string;
-    amount?: number;
-    category?: string;
-  }>({});
-  // Fonctionnalité du bouton "Pointer"
-  const [isPointerActive, setPointerActive] = useState(false);
-  const [selectedAmounts, setSelectedAmounts] = useState<string[]>([]);
 
   const calculateTotalPaidAmount = (expenses: Expense[]): number => {
     return expenses
@@ -87,98 +79,11 @@ export default function Dashboard() {
     fetchExpenses();
   }, []);
 
-  const handleEdit = (id: string) => {
-    setEditingId(id);
-    const expense = fixedExpenses.find((expense) => expense.id === id);
-    if (expense) {
-      setEditData({
-        name: expense.name,
-        amount: expense.amount,
-        category: expense.category,
-      });
-    }
-  };
-
-  const handleSave = async (id: string) => {
-    try {
-      const response = await fetch(`/api/expenses/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editData),
-      });
-      if (response.ok) {
-        const updatedData = await response.json();
-        setFixedExpenses((prev) =>
-          prev.map((expense) => (expense.id === id ? updatedData : expense))
-        );
-        setEditingId(null);
-      } else {
-        console.error("Erreur lors de la sauvegarde des modifications.");
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetch(`/api/expenses/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        setFixedExpenses((prev) => prev.filter((expense) => expense.id !== id));
-      } else {
-        console.error("Erreur lors de la suppression de la charge.");
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  };
-
-  const handlePointerClick = async () => {
-    setPointerActive(!isPointerActive); // Active le mode de pointage
-  };
-
-  const updatePaymentStatus = async (id: string, isPaid: boolean) => {
-    try {
-      await fetch("/api/expenses/update-payment-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, paid: isPaid }),
-      });
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-    }
-  };
-
-  const handleCheckboxChange = async (id: string, isChecked: boolean) => {
-    // Mettre à jour l'état local
-    setFixedExpenses((prevExpenses) =>
-      prevExpenses.map((expense) =>
-        expense.id === id ? { ...expense, paid: isChecked } : expense
-      )
-    );
-
-    // Mettre à jour le statut de paiement dans le backend
-    try {
-      await updatePaymentStatus(id, isChecked);
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
         {/* Header Section */}
-        <div className="max-w-4xl mx-auto bg-white md:rounded-lg shadow-lg p-4 md:p-2">
+        <div className="max-w-4xl mx-auto bg-gray-100 md:rounded-lg shadow-lg p-2 md:p-2">
           <div className="flex flex-row md:flex-col items-center justify-between mb-4">
             <h1
               className={cn(
@@ -222,142 +127,12 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-
-          {/* List of Fixed Expenses */}
-          <div>
-            <div className="flex justify-between">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Détails des Charges Fixes
-              </h2>
-              {/* Bouton "Pointer" */}
-              <Button variant="primaryBorder" size="sm" onClick={handlePointerClick}>
-                {isPointerActive ? "Valider" : "Pointer"}
-              </Button>
-            </div>
-            <ul className="space-y-1 border border-gray-300 rounded-lg p-2 pb-0">
-              {fixedExpenses.map((expense) => (
-                <li
-                  key={expense.id}
-                  className="flex items-center border-b border-b-gray-300 p-2 shadow-sm"
-                >
-                  <div className="flex items-center space-x-4 flex-1">
-                    {/* Affichage des cases à cocher si "Pointer" est actif */}
-                    {isPointerActive ? (
-                      <>
-                        <Checkbox
-                          checked={expense.paid}
-                          onCheckedChange={(checked) =>
-                            handleCheckboxChange(expense.id, Boolean(checked))
-                          }
-                          className="text-blue-500 border-blue-500 focus:ring-blue-500"
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    <div className="flex-shrink-0">
-                      {categoryIcons[expense.category] || (
-                        <HomeIcon className="w-6 h-6 text-gray-500" />
-                      )}
-                    </div>
-                    {editingId === expense.id ? (
-                      <div className="flex-1 space-y-2">
-                        <input
-                          type="text"
-                          value={editData.name}
-                          onChange={(e) =>
-                            setEditData({ ...editData, name: e.target.value })
-                          }
-                          className="w-full border rounded p-2"
-                          placeholder="Nom"
-                        />
-                        <input
-                          type="number"
-                          value={editData.amount}
-                          onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              amount: parseFloat(e.target.value),
-                            })
-                          }
-                          className="w-full border rounded p-2"
-                          placeholder="Montant"
-                        />
-                        <select
-                          value={editData.category}
-                          onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              category: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded p-2"
-                        >
-                          {Object.keys(categoryIcons).map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="flex justify-end space-x-2 mt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSave(expense.id)}
-                            className="p-1"
-                          >
-                            <CheckIcon className="w-5 h-5 text-green-600" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingId(null)}
-                            className="p-1"
-                          >
-                            <Cross1Icon className="w-5 h-5 text-red-600" />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-600">
-                          {expense.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {expense.amount} €
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  {!editingId && (
-                    <div className="ml-4 flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(expense.id)}
-                        className="p-1"
-                      >
-                        <Pencil2Icon className="w-5 h-5 text-blue-600" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(expense.id)}
-                        className="p-1"
-                      >
-                        <TrashIcon className="w-5 h-5 text-red-600" />
-                      </Button>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <TabCategory fixedExpenses={fixedExpenses} />
 
           {/* New Expense Button */}
           <div className="mt-8 mb-8 flex justify-center">
             <NewButton>
-              <Button variant="secondary" size="lg">
+              <Button variant="default" size="lg">
                 <PlusIcon className="w-5 h-5 mr-2" />
                 Nouvelle Charge
               </Button>

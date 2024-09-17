@@ -24,7 +24,7 @@ const buttonVariants = cva(
         danger: // Nouveau variant pour le danger
           "bg-danger text-danger-foreground shadow-sm hover:bg-danger/90",
           primaryBorder:
-          "border border-2 border-primary bg-white text-black shadow-sm hover:bg-white/10 hover:text-primary-dark",
+          "border border-2 border-primary bg-gray-100 text-primary shadow-sm hover:bg-white/10 hover:text-primary-dark",
       },
       size: {
         default: "h-9 px-4 py-2",
