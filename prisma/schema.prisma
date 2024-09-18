@@ -63,9 +63,11 @@ model User {
   sessions       Session[]
   FixedExpense   FixedExpense[]
   MonthlyExpense MonthlyExpense[]
+  balances       Balance[]        // Relation avec le modèle Balance
 
   @@map("users")
 }
+
 
 model VerificationToken {
   identifier String
@@ -104,3 +106,15 @@ model MonthlyExpense {
 
   @@map("monthly_expenses")
 }
+
+model Balance {
+  id        String   @id @default(cuid()) // Identifiant unique pour chaque solde
+  userId    String   // ID de l'utilisateur
+  amount    Float    // Montant du solde
+  updatedAt DateTime @updatedAt // Date et heure de la dernière mise à jour
+  createdAt DateTime @default(now()) // Date de création de l'enregistrement
+  
+  // Relation avec l'utilisateur
+  user      User     @relation(fields: [userId], references: [id])
+}
+

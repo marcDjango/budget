@@ -1,9 +1,21 @@
-import { auth, signOut } from "@/auth";
+"use client";
+import { signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { useSession } from 'next-auth/react';
+import { useCallback } from "react";
 
-const SettingPage = async () => {
-    const session = await auth();
+const SettingPage = () => {
+    const { data: session } = useSession();
+
+    // Handler for sign out
+    const handleSignOut = useCallback(async () => {
+        try {
+            await signOut();
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -22,6 +34,7 @@ const SettingPage = async () => {
                             </div>
                             {session?.user?.image && (
                                 <div className="flex justify-center">
+                                    {/* Uncomment and use the image if needed */}
                                     {/* <img 
                                         src={session.user.image} 
                                         alt="Profile" 
@@ -42,19 +55,14 @@ const SettingPage = async () => {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <form action={async () => {
-                            "use server";
-                            await signOut();
-                        }} className="w-full">
-                            <Button className="w-full" type="submit">
-                                Déconnexion
-                            </Button>
-                        </form>
+                        <Button className="w-full" onClick={handleSignOut}>
+                            Déconnexion
+                        </Button>
                     </CardFooter>
                 </Card>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default SettingPage;

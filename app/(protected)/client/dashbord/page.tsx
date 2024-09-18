@@ -38,17 +38,16 @@ export default function Dashboard() {
 
   const calculateTotalPaidAmount = (expenses: Expense[]): number => {
     return expenses
-      .filter((expense) => expense.paid) // Filtrer les dépenses dont le statut est 'paid' (true)
-      .reduce((total, expense) => total + expense.amount, 0); // Additionner les montants
+      .filter((expense) => expense.paid)
+      .reduce((total, expense) => total + expense.amount, 0);
   };
+  
   const totalPaidAmount = calculateTotalPaidAmount(fixedExpenses);
-
   const totalFixedExpenses = fixedExpenses.reduce(
     (total, expense) => total + expense.amount,
     0
   );
   const restantàpayer = totalFixedExpenses - totalPaidAmount;
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,15 +69,15 @@ export default function Dashboard() {
   if (isLoading) {
     return <Loader />;
   }
-  
+
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Balance check */}
+
       <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto bg-gray-100 md:rounded-lg shadow-lg p-2 md:p-2">
-          <Header
-            title="Tableau de bord"
-          />
+          <Header title="Tableau de bord" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {/* Card for Fixed Expenses */}
             <FixedExpensesCard
