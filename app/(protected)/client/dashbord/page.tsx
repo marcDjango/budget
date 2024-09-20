@@ -8,28 +8,8 @@ import TabCategory from "@/components/dashbord/tabCategory";
 import BottomActionBar from "@/components/dashbord/BottomActionBar";
 import Header from "@/components/dashbord/HeaderSection";
 import Loader from "@/components/dashbord/Loader";
+import { Expense, FixedExpense, MonthlyExpense } from "./types/types";
 
-interface Expense {
-  id: string;
-  name: string;
-  amount: number;
-  paid: boolean;
-}
-
-interface FixedExpense {
-  id: string;
-  name: string;
-  amount: number;
-  category: string;
-  paid: boolean;
-}
-
-interface MonthlyExpense {
-  id: string;
-  month: number;
-  year: number;
-  amount: number;
-}
 
 export default function Dashboard() {
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
