@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { NewButton } from "@/components/dashbord/new-depencies-button";
 import { FixedExpensesCard } from "@/components/dashbord/FixedExpensesCard";
 import TabCategory from "@/components/dashbord/tabCategory";
@@ -9,7 +7,6 @@ import BottomActionBar from "@/components/dashbord/BottomActionBar";
 import Header from "@/components/dashbord/HeaderSection";
 import Loader from "@/components/dashbord/Loader";
 import { Expense, FixedExpense, MonthlyExpense } from "./types/types";
-
 
 export default function Dashboard() {
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
@@ -21,7 +18,7 @@ export default function Dashboard() {
       .filter((expense) => expense.paid)
       .reduce((total, expense) => total + expense.amount, 0);
   };
-  
+
   const totalPaidAmount = calculateTotalPaidAmount(fixedExpenses);
   const totalFixedExpenses = fixedExpenses.reduce(
     (total, expense) => total + expense.amount,
@@ -53,7 +50,6 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Balance check */}
-
       <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto bg-gray-100 md:rounded-lg shadow-lg p-2 md:p-2">
@@ -64,7 +60,6 @@ export default function Dashboard() {
               totalAmount={totalFixedExpenses}
               restant={restantàpayer}
             />
-
             {/* Card for Monthly Expenses */}
             <div className="bg-white rounded-lg shadow-lg p-2 md:p-4">
               <h2 className="text-xl font-semibold text-gray-800">
@@ -83,15 +78,9 @@ export default function Dashboard() {
             </div>
           </div>
           <TabCategory fixedExpenses={fixedExpenses} />
-
           {/* New Expense Button */}
           <div className="mt-8 mb-8 flex justify-center">
-            <NewButton>
-              <Button variant="default" size="lg">
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Nouvelle Charge
-              </Button>
-            </NewButton>
+            <NewButton>Nouvelle Charge</NewButton>
           </div>
         </div>
       </main>
