@@ -5,9 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { useSession } from 'next-auth/react';
 import { useCallback } from "react";
 
-const SettingPage = () => {
+const SettingPage =  () => {
     const { data: session } = useSession();
-
     // Handler for sign out
     const handleSignOut = useCallback(async () => {
         try {

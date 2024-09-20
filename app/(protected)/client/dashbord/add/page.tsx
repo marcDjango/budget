@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { FormError } from '@/components/auth/form-error';  // Import des composants d'erreur et succès
 import { FormSucces } from '@/components/auth/form-succes';
 
-const AddCharge = () => {
+const AddCharge =  () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-
+ 
+  
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
