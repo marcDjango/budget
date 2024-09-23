@@ -1,39 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 // prisma/schema.prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // uncomment next line if you use Prisma <5.10
-  // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String  @map("user_id")
-  type              String
-  provider          String
-  providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
 }
 
 model Session {
@@ -51,70 +23,143 @@ enum UserRole {
   USER
 }
 
-model User {
-  id             String           @id @default(cuid())
-  name           String?
-  email          String?          @unique
-  emailVerified  DateTime?        @map("email_verified")
-  image          String?
-  password       String?
-  role           UserRole         @default(USER)
-  accounts       Account[]
-  sessions       Session[]
-  FixedExpense   FixedExpense[]
-  MonthlyExpense MonthlyExpense[]
-  balances       Balance[]        // Relation avec le modèle Balance
-
-  @@map("users")
-}
-
-
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map("verificationtokens")
+  @@map("verification_tokens")
+}
+
+model AccountType {
+  id        String     @id @default(cuid())
+  name      String     // Perso ou Conjoint
+  accounts  Account[]  // Relation inverse avec Account
+
+  @@map("account_types")
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String?
+  email           String?          @unique
+  emailVerified   DateTime?        @map("email_verified")
+  image           String?
+  password        String?
+  role            UserRole         @default(USER)
+  accounts        Account[]
+  sessions        Session[]
+  fixedExpenses   FixedExpense[]
+  monthlyExpenses MonthlyExpense[]
+  balances        Balance[]
+  
+  // Relation inverse pour `authorizedUser`
+  authorizedAccounts Account[] @relation("AuthorizedUser")
+  expenses        Expense[]  
+
+  @@map("users")
+}
+
+model Account {
+  id                String       @id @default(cuid())
+  userId            String       @map("user_id")
+  typeId            String       // Champ pour le type de compte (perso ou conjoint)
+  type              AccountType  @relation(fields: [typeId], references: [id], onDelete: Cascade) // Relie à la table AccountType
+  provider          String?
+  providerAccountId String?      @map("provider_account_id")
+  refresh_token     String?      @db.Text
+  access_token      String?      @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?      @db.Text
+  session_state     String?
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorizedUserId  String?      // Champ pour l'utilisateur autorisé (nullable)
+  authorizedUser    User?        @relation("AuthorizedUser", fields: [authorizedUserId], references: [id]) // Relation avec l'utilisateur autorisé (nullable)
+
+  isDefault         Boolean      @default(false) // Valeur par défaut à false
+
+  // Relations inverses
+  fixedExpenses     FixedExpense[]
+  monthlyExpenses   MonthlyExpense[]
+  balances          Balance[]
+  expenses          Expense[]
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model FixedExpense {
   id           String   @id @default(cuid())
   userId       String   @map("user_id")
+  accountId    String?  // Champ pour l'ID du compte associé (nullable)
   name         String
   amount       Float
   category     String
-  paid         Boolean  @default(false) // Nouveau champ
-  paymentDate  DateTime? // Nouveau champ (peut être null)
-  occurrence   String?  // Nouveau champ (peut être null)
+  paid         Boolean  @default(false)
+  paymentDate  DateTime?
+  occurrence   String?
   createdAt    DateTime @default(now())
+
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account?  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("fixed_expenses")
 }
 
-
-
 model MonthlyExpense {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  month     Int // mois de la dépense (1-12)
-  year      Int // année de la dépense
-  amount    Float // montant total des dépenses du mois
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  accountId    String?  // Champ pour l'ID du compte associé (nullable)
+  month        Int
+  year         Int
+  amount       Float
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account?  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("monthly_expenses")
 }
 
 model Balance {
-  id        String   @id @default(cuid()) // Identifiant unique pour chaque solde
-  userId    String   // ID de l'utilisateur
-  amount    Float    // Montant du solde
-  updatedAt DateTime @updatedAt // Date et heure de la dernière mise à jour
-  createdAt DateTime @default(now()) // Date de création de l'enregistrement
-  
-  // Relation avec l'utilisateur
-  user      User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid()) 
+  userId    String   @map("user_id")
+  accountId String   // ID du compte auquel ce solde est lié
+  amount    Float    
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("balances")
 }
 
+enum ExpenseType {
+  FIXED
+  MONTHLY
+}
+
+model Expense {
+  id           String      @id @default(cuid())
+  userId       String      @map("user_id")
+  accountId    String?     // Nullable, comme avant
+  name         String
+  amount       Float
+  category     String
+  paid         Boolean     @default(false)
+  paymentDate  DateTime?
+  occurrence   String?     // Optionnel
+  type         ExpenseType // FIXED ou MONTHLY
+  month        Int?        // Optionnel pour les dépenses mensuelles
+  year         Int?        // Optionnel pour les dépenses mensuelles
+  createdAt    DateTime    @default(now())
+
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account?    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+}

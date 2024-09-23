@@ -7,8 +7,11 @@ import BottomActionBar from "@/components/dashbord/BottomActionBar";
 import Header from "@/components/dashbord/HeaderSection";
 import Loader from "@/components/dashbord/Loader";
 import { Expense, FixedExpense, MonthlyExpense } from "./types/types";
+import AccountBalance from "@/components/dashbord/AccountBalance";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
+  const { data: session, status } = useSession();
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const [monthlyExpenses, setMonthlyExpenses] = useState<MonthlyExpense[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -41,7 +44,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [session]);
 
   if (isLoading) {
     return <Loader />;
@@ -49,18 +52,15 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Balance check */}
       <main className="flex-1 p-0 bg-gradient-to-r from-sky-400 to-blue-800 pb-20">
-        {/* Header Section */}
         <div className="max-w-4xl mx-auto bg-gray-100 md:rounded-lg shadow-lg p-2 md:p-2">
           <Header title="Tableau de bord" />
+          <AccountBalance  />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {/* Card for Fixed Expenses */}
             <FixedExpensesCard
               totalAmount={totalFixedExpenses}
               restant={restantàpayer}
             />
-            {/* Card for Monthly Expenses */}
             <div className="bg-white rounded-lg shadow-lg p-2 md:p-4">
               <h2 className="text-xl font-semibold text-gray-800">
                 Dépenses Mensuelles
@@ -78,14 +78,11 @@ export default function Dashboard() {
             </div>
           </div>
           <TabCategory fixedExpenses={fixedExpenses} />
-          {/* New Expense Button */}
           <div className="mt-8 mb-8 flex justify-center">
             <NewButton>Nouvelle Charge</NewButton>
           </div>
         </div>
       </main>
-
-      {/* Bottom Action Block */}
       <BottomActionBar />
     </div>
   );

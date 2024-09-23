@@ -7,17 +7,23 @@ const prisma = new PrismaClient();
 // GET: Récupérer le solde spécifique par ID
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
-console.log(id);
 
-  const balance = await prisma.balance.findFirst({
-    where: { userId:id },
-  });
+  try {
+    const balance = await prisma.balance.findMany({
+      where: { accountId:id },
+    });
 
-  if (!balance) {
-    return NextResponse.json({ error: 'Balance not found' }, { status: 404 });
+    // Si le solde n'existe pas, renvoyer exists: false
+    if (!balance) {
+      return NextResponse.json({ exists: false }, { status: 200 });
+    }
+
+    // Si le solde existe, renvoyer exists: true et les détails du solde
+    return NextResponse.json({ exists: true, balance });
+  } catch (error) {
+    console.error('Error fetching balance:', error);
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
   }
-
-  return NextResponse.json({ balance });
 }
 
 // PUT: Mettre à jour un solde par ID
