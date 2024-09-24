@@ -146,7 +146,7 @@ enum ExpenseType {
 model Expense {
   id           String      @id @default(cuid())
   userId       String      @map("user_id")
-  accountId    String?     // Nullable, comme avant
+  accountId    String     // Nullable, comme avant
   name         String
   amount       Float
   category     String

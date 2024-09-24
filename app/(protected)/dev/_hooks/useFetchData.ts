@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 
 // Hook pour récupérer les dépenses d'un utilisateur spécifique
-export function useUserExpenses(accountId: string | null) {
+export function useUserExpenses(accountId: string | undefined) {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
      const fetchExpenses = async () => {
-      setLoading(true);
       try {
         const response = await fetch(`/api/dev/${accountId}`, {
           method: 'GET',
